@@ -1,0 +1,45 @@
+server:
+  port: 8080
+spring:
+  cloud:
+    stream:
+      rabbit:
+        bindings:
+          inputInclusaoRecadoPostegreSQL:
+            consumer:
+              autoBindDlq: true
+              dlq-dead-letter-exchange:
+          inputInclusaoRecadoCache:
+            consumer:
+              autoBindDlq: true
+              dlq-dead-letter-exchange:
+      bindings:
+        inputInclusaoRecadoPostegreSQL:
+          destination: inclusao.recado
+          binder: broker_rabbit
+          contentType: application/json
+          group: postegresql
+          consumer:
+            maxAttempts: 1
+        inputInclusaoRecadoCache:
+          destination: inclusao.recado
+          binder: broker_rabbit
+          contentType: application/json
+          group: cache
+          consumer:
+            maxAttempts: 1
+        outputInclusaoRecado:
+          destination: inclusao.recado
+          binder: broker_rabbit
+          contentType: application/json
+      binders:
+        broker_rabbit:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: localhost
+                port: 5672
+                username: guest
+                password: guest
+                virtual-host: /
